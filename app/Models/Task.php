@@ -25,7 +25,7 @@ class Task extends Model
         'status',
         'published_at',
     ];
-    
+
     public static array $allowedFilters = [
         'title'
     ];
@@ -73,6 +73,53 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function updateSubTask($record, $data)
+    {
+        try {
+            
+            //Check if all subtask status are done
+            $allDone = array_reduce($data, function ($carry, $subtask) {
+                return $carry && $subtask['subtaskStatus'] === TaskStatus::DONE;
+            }, true);
+
+            if ($allDone) {
+                // "All subtasks are Done";
+                $record->status = TaskStatus::DONE;
+            }
+
+            $record->subtask = $data;
+            $record->save();
+
+            Notification::make()
+                ->title('Subtask has been successfully updated')
+                ->success()
+                ->send();
+
+        } catch (Exception $e) {
+            // Handle general exceptions
+            // For example, log the error and return a generic error response /  Notify the user for the error response
+            Log::error('An error occurred: '.$e->getMessage());
+            $errorMessage = 'Failed to update subtask,  something error occurred, Please contact system admin.';
+            $this->handleNotificationError($errorMessage);
+        }
+
+    }
+
+    /**
+     * @param $message
+     * @return Notification
+     * Send a notification to the user if error occurs
+     */
+    public function handleNotificationError($message)
+    {
+        return
+            Notification::make()
+                ->title($message)
+                ->danger()
+                ->send();
+
+    }
+
     /**
      * @param $record
      * @param $status
@@ -111,21 +158,6 @@ class Task extends Model
             Notification::make()
                 ->title('Task has been successfully set as '.$status)
                 ->success()
-                ->send();
-
-    }
-
-    /**
-     * @param $message
-     * @return Notification
-     * Send a notification to the user if error occurs
-     */
-    public function handleNotificationError($message)
-    {
-        return
-            Notification::make()
-                ->title($message)
-                ->danger()
                 ->send();
 
     }

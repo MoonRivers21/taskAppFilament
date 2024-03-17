@@ -11,15 +11,18 @@ use App\Models\Task;
 use App\Rules\CheckUniqueTaskTitle;
 use Exception;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\Group;
 use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use Filament\Infolists\Infolist;
@@ -147,6 +150,38 @@ class TaskResource extends Resource
                         ->modalDescription()
                         ->action(fn(Task $record) => $record->setTaskStatus($record, TaskStatus::DONE)),
 
+                    Action::make('editSubTask')
+                        ->hidden(fn(Task $record): bool => $record->status == TaskStatus::DONE)
+                        ->label('Manage Subtask')
+                        ->icon('heroicon-o-document-text')
+                        ->modalFooterActionsAlignment(Alignment::End)
+                        ->closeModalByClickingAway(false)
+                        ->stickyModalHeader()
+                        ->fillForm(fn(Task $record): array => [
+                            'subtask' => $record->subtask,
+                        ])
+                        ->form([
+                            Repeater::make('subtask')
+                                ->hiddenLabel()
+                                ->schema([
+                                    TextInput::make('subTaskTitle')
+                                        ->required()
+                                        ->columnSpan(2)
+                                        ->label('Title')
+                                        ->live(onBlur: true),
+
+                                    Select::make('subtaskStatus')
+                                        ->required(fn(Get $get): bool => !empty(trim($get('subTaskTitle'))))
+                                        ->label('Status')
+                                        ->options(TaskStatus::toSelectArray())
+
+                                ])->columns(3)->orderColumn(false)->addActionLabel('Add more')
+                        ])
+                        ->action(function (array $data, Task $record): void {
+                            $record->updateSubTask($record, $data['subtask']);
+                        }),
+
+
                     RestoreAction::make(),
 
                 ])
@@ -225,6 +260,22 @@ class TaskResource extends Resource
                         ])->columns(1)
                 ]),
 
+                Section::make()
+                    ->schema([
+                        Repeater::make('subtask')
+                            ->schema([
+                                TextInput::make('subTaskTitle')->columnSpan(2)
+                                    ->label('Title')
+                                    ->live(onBlur: true),
+
+                                Select::make('subtaskStatus')
+                                    ->required(fn(Get $get
+                                    ): bool => !empty(trim($get('subTaskTitle'))))
+                                    ->label('Status')
+                                    ->options(TaskStatus::toSelectArray())
+                            ])->columns(3)->orderColumn(false)->addActionLabel('Add more')
+                    ])->columnSpan(2)
+
 
             ])->columns(3);
     }
@@ -282,7 +333,32 @@ class TaskResource extends Resource
                                     ->dateTime('M d, Y - h:iA'),
 
 
-                            ])->columns(4)
+                            ])->columns(4),
+
+                        \Filament\Infolists\Components\Section::make('Subtask')
+                            ->icon('heroicon-o-document-duplicate')
+                            ->collapsible()
+                            ->schema([
+                                RepeatableEntry::make('subtask')
+                                    ->hintAction(
+                                        \Filament\Infolists\Components\Actions\Action::make('manageSubTask')
+                                            ->iconButton()
+                                            ->icon('heroicon-o-document-text')
+                                    )
+                                    ->hiddenLabel()
+                                    ->schema([
+                                        TextEntry::make('subTaskTitle')
+                                            ->columnSpan(2)
+                                            ->default('-'),
+
+                                        TextEntry::make('subtaskStatus')
+                                            ->badge()
+                                            ->icon(fn($state) => TaskStatus::fromValue($state)->icon(trim($state)))
+                                            ->color(fn($state) => TaskStatus::fromValue($state)->color(trim($state)))
+                                            ->label('Status'),
+
+                                    ])->columns(4)->columnSpanFull()
+                            ])
                     ])->columns(3)
             ]);
     }

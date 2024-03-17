@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Laravel
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+paths:
+  /api/tasks:
+    post:
+      summary: ''
+      operationId: postApiTasks
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 100 characters.'
+                  example: ltdjc
+                content:
+                  type: string
+                  description: 'Must be at least 3 characters.'
+                  example: fjlijrjmblqeztgyptrbjyjsrqspbjecqqumnuf
+                user_id:
+                  type: integer
+                  description: 'Must not be one of <code>0</code> or <code>null</code>.'
+                  example: 4
+                image:
+                  type: string
+                  description: ''
+                  example: null
+              required:
+                - title
+                - content
+                - user_id
+      security: []
+    get:
+      summary: ''
+      operationId: getApiTasks
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+  '/api/tasks/{id}':
+    put:
+      summary: ''
+      operationId: putApiTasksId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 'Must be at least 3 characters. Must not be greater than 100 characters.'
+                  example: xseuo
+                content:
+                  type: string
+                  description: 'Must be at least 3 characters.'
+                  example: ajpnwpuyzhafxpkdvupaqdkyzycaurvpqxooiucpuhhcizzrmvxaozvfcfzpakcoeuibarhmxirebssyhzrpoij
+                image:
+                  type: string
+                  description: ''
+                  example: null
+                published:
+                  type: string
+                  description: ''
+                  example: null
+                publishedAt:
+                  type: string
+                  description: ''
+                  example: null
+                status:
+                  type: string
+                  description: ''
+                  example: To-do
+                  enum:
+                    - To-do
+                    - In-progress
+                    - Done
+              required:
+                - title
+                - content
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiTasksId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    get:
+      summary: ''
+      operationId: getApiTasksId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the task.'
+        example: tempore
+        required: true
+        schema:
+          type: string
+  /api/user:
+    get:
+      summary: ''
+      operationId: getApiUser
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+tags:
+  -
+    name: Endpoints
+    description: ''
