@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\LaraVersion;
 use App\Filament\Pages\TaskAppVersion;
+use App\Filament\Resources\TaskResource\Widgets\StatsTodoOverview;
+use App\Filament\Resources\TaskResource\Widgets\TaskTodo;
 use Awcodes\FilamentVersions\Providers\LaravelVersionProvider;
 use Awcodes\FilamentVersions\Providers\PHPVersionProvider;
 use Awcodes\FilamentVersions\VersionsPlugin;
@@ -15,7 +17,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -36,7 +37,6 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->profile(isSimple: false)
-            ->spa()
             ->colors([
                 'danger' => Color::Red,
                 'gray' => Color::Zinc,
@@ -45,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Green,
                 'warning' => Color::Amber,
                 'blue' => Color::Blue,
+                'purple' => Color::Purple,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -53,8 +54,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                StatsTodoOverview::make(),
+                TaskTodo::make()
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -17,7 +17,7 @@ class PaginationHandler extends Handlers
     {
         $model = static::getEloquentQuery();
         $authId = Auth::id();
-
+        
 
         $query = QueryBuilder::for($model)
             ->where('user_id', $authId)

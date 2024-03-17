@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('migrate:fresh-seed')->everyThirtyMinutes();
+        $schedule->command('tasks:delete-old')->daily();
     }
 
     /**

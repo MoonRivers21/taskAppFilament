@@ -17,15 +17,7 @@ class Task extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public static array $allowedFields = [
-        'title',
-        'content',
-        'image',
-        'user_id',
-        'status',
-        'published_at',
-    ];
-
+    
     public static array $allowedFilters = [
         'title'
     ];
@@ -76,7 +68,7 @@ class Task extends Model
     public function updateSubTask($record, $data)
     {
         try {
-            
+
             //Check if all subtask status are done
             $allDone = array_reduce($data, function ($carry, $subtask) {
                 return $carry && $subtask['subtaskStatus'] === TaskStatus::DONE;

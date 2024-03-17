@@ -8,13 +8,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class TaskTransformer extends JsonResource
 {
 
+
     /**
      * Transform the resource into an array.
      *
      * @param  Request  $request
      * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'taskId' => $this->id,

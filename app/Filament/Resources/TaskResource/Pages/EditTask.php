@@ -13,6 +13,13 @@ class EditTask extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('backToPrev')
+                ->label('Back')
+                ->outlined()
+                ->color('blue')
+                ->url(fn() => $this->previousUrl ?? $this->getResource()::getUrl('index'))
+                ->icon('heroicon-o-arrow-uturn-left'),
+
             Actions\DeleteAction::make()
                 ->label('Move to trash')
                 ->icon('heroicon-o-trash'),
