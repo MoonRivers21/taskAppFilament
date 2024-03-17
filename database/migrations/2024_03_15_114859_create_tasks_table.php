@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('status')->default(TaskStatus::TODO);
             $table->dateTime('published_at')->nullable();
             $table->boolean('published')->default(false);
+            $table->json('subtask')->nullable();
             $table->timestamps();
         });
     }

@@ -18,15 +18,16 @@ class PaginationHandler extends Handlers
         $model = static::getEloquentQuery();
         $authId = Auth::id();
 
+
         $query = QueryBuilder::for($model)
             ->where('user_id', $authId)
             ->allowedFields($model::$allowedFields ?? [])
-            ->allowedSorts($model::$allowedSorts ?? [])
+            ->allowedSorts(['title', 'created_at'])
             ->allowedFilters($model::$allowedFilters ?? [])
             ->allowedIncludes($model::$allowedIncludes ?? null)
             ->paginate(request()->query('per_page'))
             ->appends(request()->query());
- 
+
         return static::getApiTransformer()::collection($query);
     }
 }

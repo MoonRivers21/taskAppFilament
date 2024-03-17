@@ -16,11 +16,16 @@ use Illuminate\Support\Facades\Log;
 class Task extends Model
 {
     use HasFactory, SoftDeletes;
- 
-    public static array $allowedSorts = [
+
+    public static array $allowedFields = [
         'title',
-        'created_at'
+        'content',
+        'image',
+        'user_id',
+        'status',
+        'published_at',
     ];
+    
     public static array $allowedFilters = [
         'title'
     ];
@@ -33,9 +38,11 @@ class Task extends Model
         'status',
         'published_at',
         'published',
+        'subtask'
     ];
     protected $casts = [
         'status' => TaskStatus::class,
+        'subtask' => 'json'
     ];
 
 
@@ -167,5 +174,6 @@ class Task extends Model
     {
         return !app(TaskPolicy::class)->togglePublished(auth()->user(), $record);
     }
+
 
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TaskResource\Api\Handlers;
 
 use App\Filament\Resources\TaskResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Rupadana\ApiService\Http\Handlers;
 
 class DeleteHandler extends Handlers
@@ -19,11 +20,12 @@ class DeleteHandler extends Handlers
     public function handler(Request $request)
     {
         $id = $request->route('id');
+        $authId = Auth::id();
 
-        $model = static::getModel()::find($id);
+        $model = static::getModel()::where('user_id', $authId)->find($id);
 
         if (!$model) {
-            return static::sendNotFoundResponse("Task not found");
+            return static::sendNotFoundResponse("Failed to delete, task not found");
         }
 
         $model->delete();

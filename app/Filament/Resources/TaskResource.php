@@ -6,7 +6,9 @@ use App\Enums\PublishStatus;
 use App\Enums\TaskStatus;
 use App\Filament\Resources\TaskResource\Api\Transformers\TaskTransformer;
 use App\Filament\Resources\TaskResource\Pages;
+use App\Filament\Resources\TaskResource\RelationManagers\TasksRelationManager;
 use App\Models\Task;
+use App\Rules\CheckUniqueTaskTitle;
 use Exception;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -45,59 +47,8 @@ class TaskResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Section::make()
-                    ->schema([
-                        TextInput::make('title')
-                            ->autofocus()
-                            ->unique(ignoreRecord: true)
-                            ->required()
-                            ->minLength(5)
-                            ->maxLength(100),
-
-                        Textarea::make('content')
-                            ->rows(10)
-                            ->required(),
-
-
-                    ])->columnSpan(2),
-
-                \Filament\Forms\Components\Group::make([
-                    Section::make()
-                        ->schema([
-                            FileUpload::make('image')
-                                ->label('Task Image')
-                                ->hint('(Optional)')
-                                ->image()
-                                ->maxSize('4000')
-                                ->directory('task-image'),
-
-                            Select::make('status')
-                                ->required()
-                                ->options(TaskStatus::toSelectArray())
-                                ->default(TaskStatus::TODO),
-
-                        ])->columnSpan(1),
-
-                    \Filament\Forms\Components\Fieldset::make('')
-                        ->schema([
-                            Toggle::make('published')
-                                ->default(1)
-                                ->offIcon('heroicon-s-document')
-                                ->onIcon('heroicon-s-document-check'),
-                        ])->columns(1)
-                ])
-
-
-            ])->columns(3);
-    }
-
-
     /**
-     * @param  Table  $table  * where user_id = current login User
+     * @param  Table  $table  where user_id = current login User
      * @return Table
      * @throws Exception
      *
@@ -218,70 +169,138 @@ class TaskResource extends Resource
 
 
             ])
-            ->recordUrl(false);
+            ->recordUrl('');
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Section::make()
+                    ->schema([
+                        TextInput::make('title')
+                            ->autofocus()
+                            ->required()
+                            ->maxLength(100)
+                            ->minLength(3)
+                            ->rule(function ($record) {
+                                // Check if $record is an instance of Task or null (for new tasks)
+                                if ($record) {
+                                    return new CheckUniqueTaskTitle($record->id, $record->title);
+                                }
+                                // For new tasks, return the CheckUniqueTaskTitle rule without arguments
+                                return new CheckUniqueTaskTitle(null, null);
+                            }),
+
+                        Textarea::make('content')
+                            ->rows(10)
+                            ->required(),
+
+
+                    ])->columnSpan(2),
+
+                \Filament\Forms\Components\Group::make([
+                    Section::make()
+                        ->schema([
+                            FileUpload::make('image')
+                                ->label('Task Image')
+                                ->hint('(Optional)')
+                                ->image()
+                                ->maxSize('4000')
+                                ->directory('task-image'),
+
+                            Select::make('status')
+                                ->required()
+                                ->options(TaskStatus::toSelectArray())
+                                ->default(TaskStatus::TODO),
+
+                        ])->columnSpan(1),
+
+                    \Filament\Forms\Components\Fieldset::make('')
+                        ->schema([
+                            Toggle::make('published')
+                                ->default(1)
+                                ->offIcon('heroicon-s-document')
+                                ->onIcon('heroicon-s-document-check'),
+                        ])->columns(1)
+                ]),
+
+
+            ])->columns(3);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                Group::make([
-                    TextEntry::make('title'),
-
-                    TextEntry::make('status')
-                        ->badge()
-                        ->icon(fn($state) => TaskStatus::fromValue($state)->icon(trim($state)))
-                        ->color(fn($state) => TaskStatus::fromValue($state)->color(trim($state)))
-                        ->columnSpan(1),
-                ])->columnSpan(2),
-
-                ImageEntry::make('image')
-                    ->hiddenLabel()
-                    ->alignCenter()
-                    ->defaultImageUrl(url('images/default.png'))
-                    ->columnSpan(1),
-
-                TextEntry::make('content')
-                    ->columnSpanFull(),
-
-                Fieldset::make('Other Info')
+                \Filament\Infolists\Components\Section::make()
                     ->schema([
-                        TextEntry::make('published')
-                            ->default('-')
-                            ->size(TextEntrySize::ExtraSmall)
-                            ->label('Publish Status')
-                            ->formatStateUsing(fn($state) => PublishStatus::fromValue($state)->label($state))
-                            ->color(fn($state) => PublishStatus::fromValue($state)->color($state))
-                            ->iconColor(fn($state) => PublishStatus::fromValue($state)->color($state))
-                            ->icon(fn($state) => PublishStatus::fromValue($state)->icon($state)),
+                        Group::make([
+                            TextEntry::make('title'),
 
-                        TextEntry::make('published_at')
-                            ->size(TextEntrySize::ExtraSmall)
-                            ->label('Published date')
-                            ->dateTime('M d, Y - h:iA'),
+                            TextEntry::make('status')
+                                ->badge()
+                                ->icon(fn($state) => TaskStatus::fromValue($state)->icon(trim($state)))
+                                ->color(fn($state) => TaskStatus::fromValue($state)->color(trim($state)))
+                                ->columnSpan(1),
+                        ])->columnSpan(2),
 
-                        TextEntry::make('created_at')
-                            ->size(TextEntrySize::ExtraSmall)
-                            ->label('Created date')
-                            ->dateTime('M d, Y - h:iA'),
+                        ImageEntry::make('image')
+                            ->hiddenLabel()
+                            ->alignCenter()
+                            ->defaultImageUrl(url('images/default.png'))
+                            ->columnSpan(1),
 
-                        TextEntry::make('deleted_at')
-                            ->size(TextEntrySize::ExtraSmall)
-                            ->label('Moved to trash date')
-                            ->icon('heroicon-o-trash')
-                            ->dateTime('M d, Y - h:iA'),
+                        TextEntry::make('content')
+                            ->columnSpanFull(),
+
+                        Fieldset::make('Other Info')
+                            ->schema([
+                                TextEntry::make('published')
+                                    ->default('-')
+                                    ->size(TextEntrySize::ExtraSmall)
+                                    ->label('Publish Status')
+                                    ->formatStateUsing(fn($state) => PublishStatus::fromValue($state)->label($state))
+                                    ->color(fn($state) => PublishStatus::fromValue($state)->color($state))
+                                    ->iconColor(fn($state) => PublishStatus::fromValue($state)->color($state))
+                                    ->icon(fn($state) => PublishStatus::fromValue($state)->icon($state)),
+
+                                TextEntry::make('published_at')
+                                    ->size(TextEntrySize::ExtraSmall)
+                                    ->label('Published date')
+                                    ->dateTime('M d, Y - h:iA'),
+
+                                TextEntry::make('created_at')
+                                    ->size(TextEntrySize::ExtraSmall)
+                                    ->label('Created date')
+                                    ->dateTime('M d, Y - h:iA'),
+
+                                TextEntry::make('deleted_at')
+                                    ->size(TextEntrySize::ExtraSmall)
+                                    ->label('Moved to trash date')
+                                    ->icon('heroicon-o-trash')
+                                    ->dateTime('M d, Y - h:iA'),
 
 
-                    ])->columns(4)
-            ])->columns(3);
+                            ])->columns(4)
+                    ])->columns(3)
+            ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+
+        ];
+    }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListTasks::route('/'),
-            'create' => Pages\CreateTask::route('/create')
+            'create' => Pages\CreateTask::route('/create'),
+            'view' => Pages\ViewTask::route('/{record}'),
+            'edit' => Pages\EditTask::route('/{record}/edit'),
 
         ];
     }
