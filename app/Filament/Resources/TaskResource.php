@@ -153,7 +153,8 @@ class TaskResource extends Resource
             ->filters([
                 SelectFilter::make('status')
                     ->options(TaskStatus::toSelectArray()),
-                TrashedFilter::make()->label('Trashed tasks'),
+                TrashedFilter::make()->label('Trashed tasks')
+
             ])
             ->actions([
                 ActionGroup::make([
@@ -280,6 +281,7 @@ class TaskResource extends Resource
     {
         return [
             'index' => Pages\ListTasks::route('/'),
+            'create' => Pages\CreateTask::route('/create')
 
         ];
     }

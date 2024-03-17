@@ -26,7 +26,7 @@ class DetailHandler extends Handlers
             ->first();
 
         if (!$query) {
-            return static::sendNotFoundResponse('Record not found.');
+            return static::sendNotFoundResponse('Task not found.');
         }
 
         $transformer = static::getApiTransformer();

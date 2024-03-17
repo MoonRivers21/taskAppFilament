@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\TaskResource\Api\Handlers;
 
 use App\Filament\Resources\TaskResource;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateTaskRequest;
+use Illuminate\Support\Facades\Auth;
 use Rupadana\ApiService\Http\Handlers;
 
 class UpdateHandler extends Handlers
@@ -16,21 +17,26 @@ class UpdateHandler extends Handlers
         return Handlers::PUT;
     }
 
-    public function handler(Request $request)
+    public function handler(UpdateTaskRequest $request)
     {
         $id = $request->route('id');
-
-        $model = static::getModel()::find($id);
+        $authId = Auth::id();
+        $model = static::getModel()::where('user_id', $authId)->find($id);
 
         if (!$model) {
-            return static::sendNotFoundResponse();
+            return static::sendNotFoundResponse("Task not found");
         }
 
-        $model->fill($request->all());
+        $validated = $request->validated();
+        
+        $model->fill($validated);
 
         $model->save();
 
-        return static::sendSuccessResponse($model, "Successfully Update Resource");
+        $transformer = static::getApiTransformer();
+        $transFormData = new $transformer($model);
+
+        return static::sendSuccessResponse($transFormData, "Successfully Updated the task");
     }
 
     public static function getModel()

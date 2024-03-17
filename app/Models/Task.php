@@ -16,13 +16,7 @@ use Illuminate\Support\Facades\Log;
 class Task extends Model
 {
     use HasFactory, SoftDeletes;
-
-    public static array $allowedFields = [
-        'title',
-        'content',
-        'image',
-        'user_id'
-    ];
+ 
     public static array $allowedSorts = [
         'title',
         'created_at'
@@ -43,6 +37,20 @@ class Task extends Model
     protected $casts = [
         'status' => TaskStatus::class,
     ];
+
+
+    // Mutator for 'published' attribute
+    public function setPublishedAttribute($value)
+    {
+        $this->attributes['published'] = $value;
+
+        // Update 'publishedAt' if 'published' is set to 1
+        if ($value == 1) {
+            $this->attributes['published_at'] = now('Asia/Manila');
+        } else {
+            $this->attributes['published_at'] = null; // Reset 'publishedAt' if 'published' is not 1
+        }
+    }
 
     public function scopeWhereOwnTasks(Builder $query): Builder
     {
@@ -94,7 +102,7 @@ class Task extends Model
     {
         return
             Notification::make()
-                ->title('The task has been successfully set as '.$status)
+                ->title('Task has been successfully set as '.$status)
                 ->success()
                 ->send();
 

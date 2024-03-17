@@ -29,7 +29,7 @@ class CreateHandler extends Handlers
 
         //Checking the authentication if exists
         if ($authId && $authId > 0) {
-
+ 
             $validated = $request->validated();
             $model->fill($validated);
             $model->save();
