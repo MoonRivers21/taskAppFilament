@@ -1,28 +1,32 @@
 <?php
+
 namespace App\Filament\Resources\TaskResource\Api\Handlers;
 
-use Illuminate\Http\Request;
+use App\Filament\Resources\TaskResource;
+use Illuminate\Support\Facades\Auth;
 use Rupadana\ApiService\Http\Handlers;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Filament\Resources\TaskResource;
 
-class PaginationHandler extends Handlers {
-    public static string | null $uri = '/';
-    public static string | null $resource = TaskResource::class;
+class PaginationHandler extends Handlers
+{
+    public static string|null $uri = '/';
+    public static string|null $resource = TaskResource::class;
 
 
     public function handler()
     {
         $model = static::getEloquentQuery();
+        $authId = Auth::id();
 
         $query = QueryBuilder::for($model)
-        ->allowedFields($model::$allowedFields ?? [])
-        ->allowedSorts($model::$allowedSorts ?? [])
-        ->allowedFilters($model::$allowedFilters ?? [])
-        ->allowedIncludes($model::$allowedIncludes ?? null)
-        ->paginate(request()->query('per_page'))
-        ->appends(request()->query());
-
+            ->where('user_id', $authId)
+            ->allowedFields($model::$allowedFields ?? [])
+            ->allowedSorts($model::$allowedSorts ?? [])
+            ->allowedFilters($model::$allowedFilters ?? [])
+            ->allowedIncludes($model::$allowedIncludes ?? null)
+            ->paginate(request()->query('per_page'))
+            ->appends(request()->query());
+ 
         return static::getApiTransformer()::collection($query);
     }
 }

@@ -28,7 +28,7 @@ final class TaskStatus extends Enum
         return match ($value) {
             self::IN_PROGRESS => 'Task status is in progress',
             self::TODO => 'Tasks that need to be done',
-            self::DONE => 'This task is done.',
+            self::DONE => '',
             default => 'No status',
         };
     }

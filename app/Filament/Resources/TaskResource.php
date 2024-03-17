@@ -4,9 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Enums\PublishStatus;
 use App\Enums\TaskStatus;
+use App\Filament\Resources\TaskResource\Api\Transformers\TaskTransformer;
 use App\Filament\Resources\TaskResource\Pages;
 use App\Models\Task;
-use App\Policies\TaskPolicy;
 use Exception;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
@@ -22,6 +22,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ActionGroup;
@@ -96,7 +97,7 @@ class TaskResource extends Resource
 
 
     /**
-     * @param  Table  $table  *
+     * @param  Table  $table  * where user_id = current login User
      * @return Table
      * @throws Exception
      *
@@ -105,6 +106,7 @@ class TaskResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->modifyQueryUsing(fn(Builder $query) => $query->whereOwnTasks($query))
             ->paginated([10, 25, 50, 100])
             ->defaultSort('created_at', 'desc')
@@ -129,9 +131,6 @@ class TaskResource extends Resource
                     ->tooltip(fn($state) => TaskStatus::fromValue($state)->description(trim($state)))
                     ->icon(fn($state) => TaskStatus::fromValue($state)->icon(trim($state)))
                     ->color(fn($state) => TaskStatus::fromValue($state)->color(trim($state))),
-
-                TextColumn::make('user.name')
-                    ->label('Created by'),
 
                 ToggleColumn::make('published')
                     ->afterStateUpdated(function ($record, $state) {
@@ -176,13 +175,8 @@ class TaskResource extends Resource
                         ->modalDescription()
                         ->action(fn(Task $record) => $record->setTaskStatus($record, TaskStatus::TODO)),
 
-
                     Action::make('markInProgress')
-                        ->hidden(function (Task $record) {
-                            return $record->status == TaskStatus::IN_PROGRESS ||
-                                $record->status == TaskStatus::DONE ||
-                                !app(TaskPolicy::class)->markInProgress(auth()->user(), $record);
-                        })
+                        ->hidden(fn(Task $record): bool => $record->handlePolicyMarkInProgress($record))
                         ->icon('heroicon-o-clock')
                         ->color('blue')
                         ->label('Mark as in-progress')
@@ -192,11 +186,7 @@ class TaskResource extends Resource
                         ->action(fn(Task $record) => $record->setTaskStatus($record, TaskStatus::IN_PROGRESS)),
 
                     Action::make('markDone')
-                        ->hidden(function (Task $record) {
-                            return $record->status == TaskStatus::DONE ||
-                                !app(TaskPolicy::class)->markDone(auth()->user(),
-                                    $record);
-                        })
+                        ->hidden(fn(Task $record): bool => $record->handlePolicyMarkDone($record))
                         ->icon('heroicon-o-clipboard-document-check')
                         ->color('success')
                         ->label('Mark as done')
@@ -205,10 +195,27 @@ class TaskResource extends Resource
                         ->modalDescription()
                         ->action(fn(Task $record) => $record->setTaskStatus($record, TaskStatus::DONE)),
 
-                    DeleteAction::make()->label('Move to trash'),
                     RestoreAction::make(),
 
-                ]),
+                ])
+                    ->size(ActionSize::Small)
+                    ->icon('heroicon-o-list-bullet')
+                    ->tooltip('Show more actions')
+                    ->extraAttributes([
+                        'class' => 'border'
+                    ]),
+
+
+                DeleteAction::make()
+                    ->size(ActionSize::Small)
+                    ->hiddenLabel()
+                    ->iconButton()
+                    ->extraAttributes(['class' => 'border ml-3'])
+                    ->modalHeading('Move to trash')
+                    ->modalDescription('Are you  sure you  want to move the task to trash?')
+                    ->tooltip('Move to trash'),
+
+
             ])
             ->recordUrl(false);
     }
@@ -269,20 +276,11 @@ class TaskResource extends Resource
     }
 
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListTasks::route('/'),
-            //'create' => Pages\CreateTask::route('/create'),
-            //'edit' => Pages\EditTask::route('/{record}/edit'),
-            //'view' => Pages\ViewTask::route('/{record}'),
+
         ];
     }
 
@@ -292,5 +290,10 @@ class TaskResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getApiTransformer()
+    {
+        return TaskTransformer::class;
     }
 }

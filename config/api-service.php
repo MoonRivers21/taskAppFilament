@@ -9,7 +9,7 @@ return [
             'token' => 'User',
         ],
         'token' => [
-            'group' => 'User',
+            'group' => 'Generate Token',
             'sort' => -1,
             'icon' => 'heroicon-o-key',
         ],

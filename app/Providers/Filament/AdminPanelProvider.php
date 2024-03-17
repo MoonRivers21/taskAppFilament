@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\LaraVersion;
+use App\Filament\Pages\TaskAppVersion;
 use Awcodes\FilamentVersions\Providers\LaravelVersionProvider;
 use Awcodes\FilamentVersions\Providers\PHPVersionProvider;
 use Awcodes\FilamentVersions\VersionsPlugin;
@@ -33,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->profile(isSimple: false)
             ->spa()
             ->colors([
                 'danger' => Color::Red,
@@ -70,9 +73,11 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 VersionsPlugin::make()->items([
                     new LaravelVersionProvider(),
-                    new PHPVersionProvider()
+                    new PHPVersionProvider(),
+                    new TaskAppVersion()
                 ])->hasDefaults(false),
-                ApiServicePlugin::make()
+                ApiServicePlugin::make(),
+                FilamentSpatieRolesPermissionsPlugin::make()
             ]);
     }
 }

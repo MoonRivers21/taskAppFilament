@@ -17,6 +17,19 @@ class Task extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public static array $allowedFields = [
+        'title',
+        'content',
+        'image',
+        'user_id'
+    ];
+    public static array $allowedSorts = [
+        'title',
+        'created_at'
+    ];
+    public static array $allowedFilters = [
+        'title'
+    ];
 
     protected $fillable = [
         'title',
@@ -27,7 +40,6 @@ class Task extends Model
         'published_at',
         'published',
     ];
-
     protected $casts = [
         'status' => TaskStatus::class,
     ];
@@ -125,6 +137,22 @@ class Task extends Model
             $record->status == TaskStatus::DONE ||
             $record->status == TaskStatus::IN_PROGRESS ||
             !app(TaskPolicy::class)->markTodo(auth()->user(), $record);
+    }
+
+    public function handlePolicyMarkInProgress($record): bool
+    {
+        return
+            $record->status == TaskStatus::IN_PROGRESS ||
+            $record->status == TaskStatus::DONE ||
+            !app(TaskPolicy::class)->markInProgress(auth()->user(), $record);
+    }
+
+    public function handlePolicyMarkDone($record): bool
+    {
+        return
+            $record->status == TaskStatus::DONE ||
+            !app(TaskPolicy::class)->markDone(auth()->user(),
+                $record);
     }
 
     public function handleTogglePublished($record): bool
