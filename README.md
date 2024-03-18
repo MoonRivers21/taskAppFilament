@@ -119,6 +119,22 @@ You're ready to go! Visit the url in your browser, and signup:
                   [POST] '/api/tasks' - Create task
                   [DELETE] '/api/tasks/{id}' - Delete task
 
+### Important Reminder:
+
+- To improve the performance of Web App try to run this command:
+
+    ```sh
+      php artisan icons:cache
+    ```
+
+  ```sh
+    php artisan optimize:clear  &&  php artisan optimize
+    ```
+
+  ```sh
+    php artisan optimize
+    ```
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Task Management App')
             ->id('admin')
             ->path('admin')
+            ->registration()
             ->login()
             ->profile(isSimple: false)
             ->colors([
