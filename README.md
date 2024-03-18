@@ -4,10 +4,10 @@
 
 ## Requirements
 
-| Tools   | Description    |
-|---------|----------------|
-| PHP     | 8.1 >= earlier |
-| Laravel | 10.*           |
+| Tools   | Description |
+|---------|-------------|
+| PHP     | 8.0 >= 8.2  |
+| Laravel | 10.*        |
 
   <br>
 

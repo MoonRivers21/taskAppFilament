@@ -25,7 +25,8 @@ class TaskFactory extends Factory
             'user_id' => User::inRandomOrder()->first()->id,
             'status' => $this->faker->randomElement(TaskStatus::toSelectArray()),
             'published' => $this->faker->boolean('50'),
-            'published_at' => $this->faker->dateTimeBetween('-20 days', now())
+            'published_at' => $this->faker->dateTimeBetween('-20 days', now()),
+            'created_at' => $this->faker->dateTimeBetween('-40 days', now()),
         ];
     }
 }
