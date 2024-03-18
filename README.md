@@ -128,7 +128,7 @@ You're ready to go! Visit the url in your browser, and signup:
     ```
 
   ```sh
-    php artisan optimize:clear  &&  php artisan optimize
+    php artisan optimize:clear 
     ```
 
   ```sh
