@@ -16,6 +16,7 @@ class FreshMigrateAndSeed extends Command
      */
     public function handle()
     {
+        $this->info('Refreshing Database....');
         Artisan::call('migrate:fresh', ['--seed' => true]);
         $this->info('Database migrated fresh and seeded successfully.');
     }

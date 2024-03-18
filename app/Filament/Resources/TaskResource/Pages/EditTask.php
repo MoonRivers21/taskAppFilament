@@ -32,4 +32,9 @@ class EditTask extends EditRecord
         return $this->getResource()::getUrl('view', ['record' => $this->getRecord()]);
     }
 
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Task has been successfully updated.';
+    }
+
 }

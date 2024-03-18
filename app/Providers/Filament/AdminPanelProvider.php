@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->favicon(asset('images/logo.png'))
             ->brandName('Task Management App')
             ->id('admin')
             ->path('admin')

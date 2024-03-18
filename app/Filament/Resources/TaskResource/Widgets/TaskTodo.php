@@ -34,6 +34,7 @@ class TaskTodo extends BaseWidget
                 TaskResource::getEloquentQuery()
                     ->where('user_id', auth()->user()->getAuthIdentifier())
                     ->where('published', PublishStatus::PUBLISHED)
+                    ->whereNull('deleted_at')
 
             )
             ->heading('Tasks ')
@@ -159,6 +160,7 @@ class TaskTodo extends BaseWidget
                     ->iconButton()
                     ->modalHeading('Move to trash')
                     ->modalDescription('Are you  sure you  want to move the task to trash?')
+                    ->successNotificationTitle('Task has been successfully moved to trash')
                     ->tooltip('Move to trash'),
 
             ])
