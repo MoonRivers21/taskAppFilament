@@ -106,7 +106,7 @@ You're ready to go! Visit the url in your browser, and signup:
 
         <br>
     - You may also browse the API Documentation inside the web app just go to the url " http://localhost:8000/docs" and
-      checkout the ENDPOINTS menu take note:ALL API Endpoints are protected by sanctum so you may experience a failure
+      checkout the ENDPOINTS menu take note:ALL API Endpoints are protected by sanctum, so you may experience a failure
       test inside the API documentation, you can test the API via Postman or any other 3rd party tools API Tester and
       use the generated TOKEN from WebApp to test all the endpoints.
 
