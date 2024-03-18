@@ -82,7 +82,7 @@ You're ready to go! Visit the url in your browser, and signup:
 
 - #### Dashboard (Basic analytics)
     - Todo, In-progress, Done, Published, Draft, Trash
-    - Tables that list only published tasks
+    - Tables that lists only published tasks
     - Quick actions
 
 <br>
