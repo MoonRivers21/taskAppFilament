@@ -91,7 +91,7 @@ You're ready to go! Visit the url in your browser, and signup:
     - Many Quick Actions
     - CRUD Functions
     - Task records belongs to Authorize Owner
-    - All action button are applied LaravelPolicies
+    - All action button are relying on LaravelPolicies
 
 <br>
 

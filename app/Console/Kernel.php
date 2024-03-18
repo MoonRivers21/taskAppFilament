@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('migrate:fresh-seed')->everyThirtyMinutes();
+        $schedule->command('migrate:fresh-seed')->everyMinute();
         $schedule->command('tasks:delete-old')->daily();
     }
 
