@@ -2,11 +2,19 @@
 
 namespace App\Console;
 
+use App\Console\Commands\DeleteOldTasks;
+use App\Console\Commands\FreshMigrateAndSeed;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+
+    protected $commands = [
+        FreshMigrateAndSeed::class,
+        DeleteOldTasks::class,
+    ];
+
     /**
      * Define the application's command schedule.
      */
@@ -15,6 +23,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('migrate:fresh-seed')->everyMinute();
         $schedule->command('tasks:delete-old')->daily();
+
+
     }
 
     /**

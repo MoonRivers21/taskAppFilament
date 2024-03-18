@@ -241,7 +241,7 @@ class TaskResource extends Resource
                                 ->label('Task Image')
                                 ->hint('(Optional)')
                                 ->image()
-                                ->maxSize('4072')
+                                ->maxSize('4000')
                                 ->directory('task-image'),
 
                             Select::make('status')
